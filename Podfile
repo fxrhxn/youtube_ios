@@ -7,7 +7,8 @@ target 'youtube_ios' do
 
 	# Pods for youtube_ios
 	pod 'Alamofire', '~> 4.5'
-
+    pod 'SwiftyJSON'
+    
 	target 'youtube_iosTests' do
 		inherit! :search_paths
 		# Pods for testing

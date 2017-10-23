@@ -8,13 +8,8 @@
 
 import UIKit
 import Alamofire
+import SwiftyJSON
 
-
-class VideoTableViewCell : UITableViewCell {
-    
-    
-    
-}
 
 class VideoVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
@@ -29,6 +24,13 @@ class VideoVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
     //Sample videos to loop from.
     var sample_vids = ["Video 1", "Video Two", "Video 3"]
+    
+    //Video data array.
+    var VideoData: JSON?
+    
+    // Stringify the Video Data
+    var VideoData_Stringed : AnyObject?
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -57,7 +59,20 @@ class VideoVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
             
             
             if let json = response.result.value {
-                print("JSON: \(json)") // serialized json response
+                
+                let parsed_data = JSON(json)
+               
+                /* GETS ONE DATA OBJECT. */
+             //   print(parsed_data["items"][0])
+                
+                
+                // Video Data
+                self.VideoData = parsed_data["items"]
+                
+                
+                //Reload the table view.
+                self.allVideos.reloadData()
+
             }
             
         
@@ -74,7 +89,13 @@ class VideoVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
     // Function that returns the amount of cells in the application.
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return sample_vids.count
+        
+        if VideoData == nil{
+            return 0
+        }else{
+            return VideoData!.count
+        }
+       
     }
     
     // Function that gives the number of sections in the application.
@@ -82,50 +103,125 @@ class VideoVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
         return 1
     }
     
-// OLD FUNCTION
+
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
+        //Test thumbnail.
+        var test_image = UIImage(named: "test_image")
+        
+        //The identifier for each cell.
         var cellIdentifier = "videoCell"
         
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as? UITableViewCell  else {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as? VideoCell  else {
             fatalError("The dequeued cell is not an instance of UITableViewCell")
         }
         
-        let meal = sample_vids[indexPath.row]
+       // let video = sample_vids[indexPath.row]
+        
+        if(VideoData == nil){
+            return cell
+        }else{
+            
+           
+            
+            
+            
+            let _id = VideoData![indexPath.row]["id"]["videoId"];
+            
+            let _title = VideoData![indexPath.row]["title"]
+            let _description = VideoData![indexPath.row]["description"]
+            let _thumbnail = VideoData![indexPath.row]["snippet"]["thumbnails"]["default"]["url"]
+            
+        
+            
+            print(_title)
+            
+            /* 
+             
+             {
+             "kind" : "youtube#searchResult",
+             "id" : {
+             "kind" : "youtube#video",
+             "videoId" : "wACJG7pNZU0"
+             },
+             "etag" : "\"cbz3lIQ2N25AfwNr-BdxUVxJ_QY\/npOB4gEWAUK88y7Kuac95EOSav0\"",
+             "snippet" : {
+             "thumbnails" : {
+             "default" : {
+             "url" : "https:\/\/i.ytimg.com\/vi\/wACJG7pNZU0\/default.jpg",
+             "width" : 120,
+             "height" : 90
+             },
+             "high" : {
+             "url" : "https:\/\/i.ytimg.com\/vi\/wACJG7pNZU0\/hqdefault.jpg",
+             "width" : 480,
+             "height" : 360
+             },
+             "medium" : {
+             "url" : "https:\/\/i.ytimg.com\/vi\/wACJG7pNZU0\/mqdefault.jpg",
+             "width" : 320,
+             "height" : 180
+             }
+             },
+             "channelId" : "UC3TlLRGt7eEWwXmcHIrfGOw",
+             "title" : "HHH Aplica Pedigree a Kofi Kingston en WWE Live Santiago De Chile 2017",
+             "publishedAt" : "2017-10-22T21:05:06.000Z",
+             "description" : "",
+             "liveBroadcastContent" : "none",
+             "channelTitle" : "Sport Online HD"
+             }
+             }
+             
+             */
+            
+        
+            //Set the video title for each video.
+            cell.videoTitle.text = "STRING!"
+            
+//    
+//            let image_url = URL(string : _thumbnail)
+//            
+//            let image_data = try? Data(contentsOf: image_url)
+//            
+//            if let imageData = image_data {
+//                cell.videoImage.image = UIImage(data: imageData)
+//            }
+//            
 
-        print(cell)
-        return cell
+            
+            //Set the description for each cell.
+            cell.videoDescription.text = "Description for"
+            
+            return cell
+        }
+       
     
     }
     
 
-
-    
-//    //MARK: - Tableview Delegate & Datasource
-//    func tableView(_ tableView:UITableView, numberOfRowsInSection section:Int) -> Int
-//    {
-//        return 10
-//    }
-//    
-//    
-//    func numberOfSectionsInTableView(tableView: UITableView) -> Int
-//    {
-//        return 1
-//    }
-//    
-//    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell
-//    {
-//        
-//        let cell: UITableViewCell = UITableViewCell(style: UITableViewCellStyle.subtitle, reuseIdentifier: "MyTestCell")
-//        return cell
-//    }
-//    
-//    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath)
-//    {
-//        
-//    }
-
-
+    //Function that turns the JSON into strings.
+    func JSONStringify(value: JSON,prettyPrinted:Bool = false) -> String{
+        
+        let options = prettyPrinted ? JSONSerialization.WritingOptions.prettyPrinted : JSONSerialization.WritingOptions(rawValue: 0)
+        
+        
+        if JSONSerialization.isValidJSONObject(value) {
+            
+            do{
+                let data = try JSONSerialization.data(withJSONObject: value, options: options)
+                if let string = NSString(data: data, encoding: String.Encoding.utf8.rawValue) {
+                    return string as String
+                }
+            }catch {
+                
+                print("error")
+                //Access error here
+            }
+            
+        }
+        return ""
+        
+    }
     
     
 
