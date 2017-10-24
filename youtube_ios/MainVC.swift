@@ -39,6 +39,7 @@ class MainVC: UIViewController, UISearchBarDelegate {
     }
     
     
+    //Function that prepares transitions via segues. 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
         //Segue for the search.

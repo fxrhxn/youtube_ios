@@ -87,6 +87,9 @@
                                 <state key="normal" title="Back">
                                     <color key="titleColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </state>
+                                <connections>
+                                    <segue destination="BYZ-38-t0r" kind="show" id="w2O-Py-SN6"/>
+                                </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Query : " textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Yds-dK-MKy">
                                 <rect key="frame" x="26" y="62" width="333" height="56"/>
@@ -105,7 +108,7 @@
                                         <rect key="frame" x="0.0" y="28" width="375" height="144"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="D9m-5H-9fb" id="2d4-zE-56p">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="144"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="143"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="EvO-FI-lse">
@@ -151,14 +154,26 @@
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
+                            <visualEffectView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jmI-YY-bjk">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="6DN-Qh-cuF">
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                </view>
+                                <blurEffect style="dark"/>
+                            </visualEffectView>
                         </subviews>
                         <color key="backgroundColor" red="0.7811706853" green="0.7811706853" blue="0.7811706853" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="vxP-vm-BTg" firstAttribute="leading" secondItem="MoL-sR-Aze" secondAttribute="leading" id="0fQ-KV-5Sb"/>
                             <constraint firstItem="pek-Ky-4ve" firstAttribute="leading" secondItem="MoL-sR-Aze" secondAttribute="leadingMargin" constant="10" id="1sY-2T-uAv"/>
+                            <constraint firstItem="jmI-YY-bjk" firstAttribute="trailing" secondItem="vxP-vm-BTg" secondAttribute="trailing" id="3MQ-xS-Sur"/>
                             <constraint firstItem="vxP-vm-BTg" firstAttribute="top" secondItem="Yds-dK-MKy" secondAttribute="bottom" constant="8" symbolic="YES" id="E78-ml-tWb"/>
+                            <constraint firstItem="jmI-YY-bjk" firstAttribute="top" secondItem="MoL-sR-Aze" secondAttribute="top" id="SJ7-tf-dP9"/>
                             <constraint firstAttribute="trailing" secondItem="vxP-vm-BTg" secondAttribute="trailing" id="T4N-d8-P0M"/>
+                            <constraint firstItem="jmI-YY-bjk" firstAttribute="leading" secondItem="vxP-vm-BTg" secondAttribute="leading" id="TvR-wU-2Kf"/>
                             <constraint firstItem="pek-Ky-4ve" firstAttribute="top" secondItem="4sN-dm-96q" secondAttribute="bottom" id="Zmy-nr-BLO"/>
+                            <constraint firstItem="jmI-YY-bjk" firstAttribute="bottom" secondItem="of8-gZ-f0h" secondAttribute="top" id="aGh-og-Fes"/>
                             <constraint firstItem="vxP-vm-BTg" firstAttribute="bottom" secondItem="of8-gZ-f0h" secondAttribute="top" id="ceO-KP-sZe"/>
                             <constraint firstItem="Yds-dK-MKy" firstAttribute="leading" secondItem="MoL-sR-Aze" secondAttribute="leadingMargin" constant="10" id="ee0-uG-vfg"/>
                             <constraint firstItem="of8-gZ-f0h" firstAttribute="top" secondItem="Yds-dK-MKy" secondAttribute="bottom" constant="549" id="uXR-lv-Hpb"/>
@@ -166,12 +181,43 @@
                     </view>
                     <connections>
                         <outlet property="allVideos" destination="vxP-vm-BTg" id="uKT-3k-cZ5"/>
+                        <outlet property="blurEffect" destination="jmI-YY-bjk" id="B1k-bD-cnO"/>
                         <outlet property="queryLabel" destination="Yds-dK-MKy" id="LJv-xX-kRt"/>
+                        <outlet property="videoView" destination="yb2-FR-gNI" id="Zsy-Xz-Iqq"/>
+                        <outlet property="videoWebView" destination="XCm-WI-Ede" id="Fou-bi-O59"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="3jI-NU-4Nf" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <view contentMode="scaleToFill" id="yb2-FR-gNI">
+                    <rect key="frame" x="0.0" y="0.0" width="302" height="402"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <subviews>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="C9K-VI-zS1">
+                            <rect key="frame" x="133" y="362" width="37" height="30"/>
+                            <state key="normal" title="Done">
+                                <color key="titleColor" red="0.6879575252532959" green="0.31883934140205383" blue="0.96857923269271851" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </state>
+                            <connections>
+                                <action selector="closeVideo:" destination="F4V-75-LZN" eventType="touchUpInside" id="Mu5-QR-Fhu"/>
+                            </connections>
+                        </button>
+                        <webView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="XCm-WI-Ede">
+                            <rect key="frame" x="31" y="20" width="248" height="334"/>
+                            <color key="backgroundColor" red="0.36078431370000003" green="0.38823529410000002" blue="0.4039215686" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        </webView>
+                    </subviews>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstItem="XCm-WI-Ede" firstAttribute="top" secondItem="yb2-FR-gNI" secondAttribute="top" constant="20" id="2NO-ho-lyJ"/>
+                        <constraint firstItem="XCm-WI-Ede" firstAttribute="leading" secondItem="yb2-FR-gNI" secondAttribute="leading" constant="31" id="4Dk-Ka-CMP"/>
+                        <constraint firstItem="C9K-VI-zS1" firstAttribute="centerX" secondItem="yb2-FR-gNI" secondAttribute="centerX" id="ClG-pu-OQc"/>
+                        <constraint firstAttribute="bottom" secondItem="C9K-VI-zS1" secondAttribute="bottom" constant="10" id="WVw-Yh-KVl"/>
+                        <constraint firstAttribute="trailing" secondItem="XCm-WI-Ede" secondAttribute="trailing" constant="23" id="WZs-iC-coQ"/>
+                        <constraint firstItem="C9K-VI-zS1" firstAttribute="top" secondItem="XCm-WI-Ede" secondAttribute="bottom" constant="8" symbolic="YES" id="fFf-Ua-bnG"/>
+                    </constraints>
+                </view>
             </objects>
-            <point key="canvasLocation" x="2041" y="9"/>
+            <point key="canvasLocation" x="1461.5999999999999" y="-52.623688155922046"/>
         </scene>
     </scenes>
     <resources>

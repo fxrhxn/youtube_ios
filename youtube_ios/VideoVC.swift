@@ -13,11 +13,24 @@ import SwiftyJSON
 
 class VideoVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
+    
+    //Web View for the video.
+    @IBOutlet weak var videoWebView: UIWebView!
+    
     //Query label
     @IBOutlet weak var queryLabel: UILabel!
     
     //Outlet that connects the table for the videos.
     @IBOutlet weak var allVideos: UITableView!
+    
+    //View for the video.
+    @IBOutlet var videoView: UIView!
+    
+    //Outlet for the blur effect.
+    @IBOutlet weak var blurEffect: UIVisualEffectView!
+    
+    //Effect variable.
+    var effect : UIVisualEffect!
     
     //Query for the search.
     var search_query : String?
@@ -26,14 +39,29 @@ class VideoVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
     var sample_vids = ["Video 1", "Video Two", "Video 3"]
     
     //Video data array.
-    var VideoData: JSON?
+    var VideoData : JSON?
+    
+    // Video Count.
+    var VideoCount : Int?
     
     // Stringify the Video Data
     var VideoData_Stringed : AnyObject?
     
+    // Query when the back button is pressed after a video.
+    var Return_query : String?
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        //Disable the effect of the blur.
+        effect = blurEffect.effect
+        //blurEffect.effect = nil
+        blurEffect.isHidden = true
+        
+      // blurEffect.removeFromSuperview()
+        
+        
         
         //Make the table delegate itself to this class.
         allVideos.delegate = self
@@ -44,31 +72,34 @@ class VideoVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
         var API_KEY = "AIzaSyCjQGG6FSax58c2VZsDNducwsswZCz0MNM"
         
         var base_url = "https://www.googleapis.com/youtube/v3"
-        var search_endpoint = "/search?&q=\(search_query!)&type=video&key=\(API_KEY)&part=snippet"
+        var search_endpoint = "/search?&q=\(search_query!)&type=video&key=\(API_KEY)&part=snippet&maxResults=50"
         
         var full_url = base_url + search_endpoint
-        
         
         
         //Change the query label text.
         queryLabel.text = "Query: \(search_query!)"
         
         
-        Alamofire.request(full_url).responseJSON { response in
+        Alamofire.request(full_url.addingPercentEncoding(withAllowedCharacters:  NSCharacterSet.urlQueryAllowed )!).responseJSON { response in
            
             
             
-            if let json = response.result.value {
+            if let rendered_json = response.result.value {
                 
-                let parsed_data = JSON(json)
+                
+                let parsed_data = JSON(rendered_json)
                
+                
                 /* GETS ONE DATA OBJECT. */
              //   print(parsed_data["items"][0])
                 
                 
                 // Video Data
                 self.VideoData = parsed_data["items"]
+                self.VideoCount = parsed_data["items"].count
                 
+            
                 
                 //Reload the table view.
                 self.allVideos.reloadData()
@@ -93,7 +124,7 @@ class VideoVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
         if VideoData == nil{
             return 0
         }else{
-            return VideoData!.count
+            return VideoCount!
         }
        
     }
@@ -103,7 +134,37 @@ class VideoVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
         return 1
     }
     
-
+    
+    //Function for selecting a row.
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        if(VideoData == nil){
+            return
+        }else{
+            
+            //Retrieve the video title and ID.
+            let _title = VideoData![indexPath.row]["snippet"]["title"]
+            let _video_id = VideoData![indexPath.row]["id"]["videoId"]
+            
+            
+            // Turn all of the json into strings.
+            if let title = _title.string {
+                
+                if let video_id = _video_id.string{
+            
+                    //Function that animates a video.
+                    animateVid(id: video_id, title : title)
+                    
+                }
+            }
+            
+           
+        }
+    
+        
+    }
+    
+    //Function to render each cell.
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         //Test thumbnail.
@@ -124,28 +185,60 @@ class VideoVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
             
            
             
-            
-            
+        // Data that we get from Youtube.
             let _id = VideoData![indexPath.row]["id"]["videoId"];
-            
-            let _title = VideoData![indexPath.row]["title"]
-            let _description = VideoData![indexPath.row]["description"]
+            let _title = VideoData![indexPath.row]["snippet"]["title"]
+            let _description = VideoData![indexPath.row]["snippet"]["description"]
             let _thumbnail = VideoData![indexPath.row]["snippet"]["thumbnails"]["default"]["url"]
             
-        
             
-            print(_title)
+
+            //Set the title.
+            if let title = _title.string {
+                
+                
+                //Set the video title for each video.
+                cell.videoTitle.text = title
+                
+            }
+          
             
-            /* 
+            //Set the description.
+            if let description = _description.string{
+                
+                cell.videoDescription.text = description
+                
+            }
+            
+            
+            //Set the image
+            if let thumbnail = _thumbnail.string{
+            
+                let image_url = URL(string : thumbnail)!
+                
+                let image_data = try? Data(contentsOf: image_url)
+                
+                if let imageData = image_data {
+                    cell.videoImage.image = UIImage(data: imageData)
+                }
+            }
+            
+            
+            /*
+             Data that gets returned boiiiii
              
              {
              "kind" : "youtube#searchResult",
+            
              "id" : {
              "kind" : "youtube#video",
              "videoId" : "wACJG7pNZU0"
              },
+             
              "etag" : "\"cbz3lIQ2N25AfwNr-BdxUVxJ_QY\/npOB4gEWAUK88y7Kuac95EOSav0\"",
+             
              "snippet" : {
+           
              "thumbnails" : {
              "default" : {
              "url" : "https:\/\/i.ytimg.com\/vi\/wACJG7pNZU0\/default.jpg",
@@ -163,6 +256,7 @@ class VideoVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
              "height" : 180
              }
              },
+             
              "channelId" : "UC3TlLRGt7eEWwXmcHIrfGOw",
              "title" : "HHH Aplica Pedigree a Kofi Kingston en WWE Live Santiago De Chile 2017",
              "publishedAt" : "2017-10-22T21:05:06.000Z",
@@ -175,27 +269,52 @@ class VideoVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
              */
             
         
-            //Set the video title for each video.
-            cell.videoTitle.text = "STRING!"
-            
-//    
-//            let image_url = URL(string : _thumbnail)
-//            
-//            let image_data = try? Data(contentsOf: image_url)
-//            
-//            if let imageData = image_data {
-//                cell.videoImage.image = UIImage(data: imageData)
-//            }
-//            
-
-            
-            //Set the description for each cell.
-            cell.videoDescription.text = "Description for"
-            
+    
+            // Return dis
             return cell
         }
        
     
+    }
+    
+    // Function that animates a popover video.
+    func animateVid(id : String = "Test", title : String = "Test"){
+        
+        let youtube_url = "https://www.youtube.com/embed/\(id)"
+        
+        let url = NSURL(string: youtube_url);
+        let request = NSURLRequest(url: url! as URL);
+        videoWebView.loadRequest(request as URLRequest);
+        
+        //Add the video view.
+        self.view.addSubview(videoView)
+        videoView.center = self.view.center
+        
+        //Stylistic changes to the video view.
+        videoView.transform = CGAffineTransform.init(scaleX: 1.3, y: 1.3)
+        videoView.alpha = 0
+        
+        //Animation so shit looks cool.
+        UIView.animate(withDuration: 0.4) {
+            self.blurEffect.isHidden = false
+            self.videoView.alpha = 1
+            self.videoView.transform = CGAffineTransform.identity
+        }
+        
+        
+    }
+    
+    //Function that removes a popover video.
+    func removeVid(){
+        UIView.animate(withDuration: 0.3, animations: {
+            self.videoView.transform = CGAffineTransform.init(scaleX: 1.3, y: 1.3)
+            self.videoView.alpha = 0
+            
+            self.blurEffect.isHidden = true
+            
+        }) { (success:Bool) in
+            self.videoView.removeFromSuperview()
+        }
     }
     
 
@@ -224,6 +343,12 @@ class VideoVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
     }
     
     
+    //Close Video Button
+    @IBAction func closeVideo(_ sender: Any) {
+        
+        //Function that removes the video.
+        removeVid()
+    }
 
     /*
     // MARK: - Navigation
